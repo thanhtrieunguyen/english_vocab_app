@@ -22,9 +22,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
 
-  Map<String, int> _todayStats = {'correct': 0, 'total': 0, 'boxPromotions': 0, 'boxDemotions': 0};
-  Map<int, int> _boxDistribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-
   @override
   void initState() {
     super.initState();
@@ -43,8 +40,9 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
     ));
 
     _loadReviewItems();
-    _loadTodayStats();
-    _loadBoxDistribution();
+    
+    // Đảm bảo khởi tạo dữ liệu Leitner
+    _leitnerService.initializeLeitnerForNewVocabularies();
   }
 
   @override
@@ -86,20 +84,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
     }
   }
 
-  Future<void> _loadTodayStats() async {
-    final stats = await _leitnerService.getTodayLeitnerStats();
-    setState(() {
-      _todayStats = stats;
-    });
-  }
-
-  Future<void> _loadBoxDistribution() async {
-    final distribution = await _leitnerService.getBoxDistribution();
-    setState(() {
-      _boxDistribution = distribution;
-    });
-  }
-
   void _toggleShowAnswer() {
     setState(() {
       _showAnswer = !_showAnswer;
@@ -118,14 +102,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
         vocabularyIndex: currentItem.vocabularyIndex,
         isCorrect: isCorrect,
       );
-
-      // Cập nhật stats
-      setState(() {
-        _todayStats['total'] = _todayStats['total']! + 1;
-        if (isCorrect) {
-          _todayStats['correct'] = _todayStats['correct']! + 1;
-        }
-      });
 
       // Chuyển sang câu tiếp theo
       _nextQuestion();
@@ -179,11 +155,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
         foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.analytics),
-            onPressed: _showStatsDialog,
-            tooltip: 'Xem thống kê',
-          ),
           IconButton(
             icon: const Icon(Icons.view_module),
             onPressed: _showBoxesOverview,
@@ -277,14 +248,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Hôm nay: ${_todayStats['correct']}/${_todayStats['total']} | Thăng hạng: ${_todayStats['boxPromotions']}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurfaceVariant,
-                ),
               ),
               const SizedBox(height: 8),
               AnimatedBuilder(
@@ -641,53 +604,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          if (_todayStats['total']! > 0) ...[
-            Container(
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.symmetric(horizontal: 32),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Kết quả hôm nay',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem(
-                        'Tổng số',
-                        '${_todayStats['total']}',
-                        Icons.quiz,
-                        colorScheme.primary,
-                      ),
-                      _buildStatItem(
-                        'Đúng',
-                        '${_todayStats['correct']}',
-                        Icons.check_circle,
-                        Colors.green,
-                      ),
-                      _buildStatItem(
-                        'Thăng hạng',
-                        '${_todayStats['boxPromotions']}',
-                        Icons.trending_up,
-                        Colors.blue,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
             style: ElevatedButton.styleFrom(
@@ -708,141 +624,11 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
-      ],
-    );
-  }
-
-  void _showStatsDialog() async {
-    final weeklyStats = await _leitnerService.getWeeklyLeitnerStats();
+  void _showBoxesOverview() async {
+    final boxDistribution = await _leitnerService.getBoxDistribution();
     
     if (!mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Thống kê Leitner System',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Phân bố theo hộp:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(5, (index) {
-                final box = index + 1;
-                final count = _boxDistribution[box] ?? 0;
-                final color = Vocabulary(
-                  word: '', meaning: '', pronunciation: '', 
-                  memoryTip: '', example: '', createdAt: DateTime.now(),
-                  leitnerBox: box,
-                ).leitnerBoxColor;
-                
-                return _buildBoxRow('Hộp $box', count, Color(color));
-              }),
-              const SizedBox(height: 16),
-              Text(
-                'Kết quả 7 ngày gần nhất:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...weeklyStats.map((stat) => _buildWeeklyStatRow(stat)),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Đóng'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBoxRow(String label, int count, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(label),
-            ],
-          ),
-          Text(
-            '$count từ',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeeklyStatRow(Map<String, dynamic> stat) {
-    final date = stat['date'] as DateTime;
-    final dayName = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][date.weekday % 7];
     
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('$dayName ${date.day}/${date.month}'),
-          Text(
-            '${stat['correct']}/${stat['total']} (+${stat['boxPromotions']})',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: stat['accuracy'] >= 80 ? Colors.green : 
-                     stat['accuracy'] >= 60 ? Colors.orange : Colors.red,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showBoxesOverview() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -855,7 +641,7 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
             mainAxisSize: MainAxisSize.min,
             children: List.generate(5, (index) {
               final box = index + 1;
-              final count = _boxDistribution[box] ?? 0;
+              final count = boxDistribution[box] ?? 0;
               final intervals = [1, 3, 7, 14, 30];
               
               return Card(
@@ -935,8 +721,6 @@ class _LeitnerSystemScreenState extends State<LeitnerSystemScreen>
                   ),
                 );
                 _loadReviewItems();
-                _loadTodayStats();
-                _loadBoxDistribution();
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

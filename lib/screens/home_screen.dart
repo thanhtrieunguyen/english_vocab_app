@@ -10,8 +10,8 @@ import 'edit_vocabulary_dialog.dart';
 import 'spaced_repetition_screen.dart';
 import 'spaced_repetition_test_screen.dart';
 import 'leitner_system_screen.dart';
-import '../widgets/spaced_repetition_info_widget.dart';
-import '../widgets/leitner_info_widget.dart';
+import '../widgets/enhanced_spaced_repetition_widget.dart';
+import '../widgets/enhanced_leitner_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -366,304 +366,226 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: colorScheme.primary,
                       ),
                     )
-                  : Column(
-                      children: [
-                        // Main content - 3 columns layout
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Column 1: Calendar (2/3 width)
-                                Expanded(
-                                  flex: 4,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.surface,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: colorScheme.shadow.withOpacity(0.08),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        // Header với navigation tuần
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                          decoration: BoxDecoration(
-                                            color: colorScheme.primary,
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(12),
-                                              topRight: Radius.circular(12),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_month,
-                                                color: colorScheme.onPrimary,
-                                                size: 18,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'Lịch học',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: colorScheme.onPrimary,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              IconButton(
-                                                onPressed: _previousWeek,
-                                                icon: Icon(Icons.arrow_back_ios, 
-                                                  color: colorScheme.onPrimary, size: 16),
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(
-                                                  minWidth: 24,
-                                                  minHeight: 24,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              GestureDetector(
-                                                onTap: _goToToday,
-                                                child: Text(
-                                                  _getMonthYearText(_currentMonth),
-                                                  style: TextStyle(
-                                                    color: colorScheme.onPrimary,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              IconButton(
-                                                onPressed: _nextWeek,
-                                                icon: Icon(Icons.arrow_forward_ios, 
-                                                  color: colorScheme.onPrimary, size: 16),
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(
-                                                  minWidth: 24,
-                                                  minHeight: 24,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        // Calendar grid
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12),
-                                            child: Column(
-                                              children: [
-                                                // Days of week header
-                                                Row(
-                                                  children: [
-                                                    'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'
-                                                  ].map((day) => Expanded(
-                                                    child: Text(
-                                                      day,
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: colorScheme.onSurfaceVariant,
-                                                      ),
-                                                    ),
-                                                  )).toList(),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Calendar days
-                                                Expanded(
-                                                  child: _buildMonthCalendar(colorScheme),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // Column 2: Spaced Repetition (1/6 width) - Split vertically
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 4, right: 4),
-                                    child: Column(
-                                      children: [
-                                        // SR Upper half
-                                        Expanded(
-                                          child: Container(
-                                            margin: const EdgeInsets.only(bottom: 4),
-                                            child: SpacedRepetitionInfoWidget(key: _spacedRepetitionKey),
-                                          ),
-                                        ),
-                                        // SR Lower half (could be stats or other info)
-                                        Expanded(
-                                          child: Container(
-                                            margin: const EdgeInsets.only(top: 4),
-                                            decoration: BoxDecoration(
-                                              color: colorScheme.surface,
-                                              borderRadius: BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: colorScheme.shadow.withOpacity(0.08),
-                                                  blurRadius: 6,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.purple.shade400,
-                                                    borderRadius: const BorderRadius.only(
-                                                      topLeft: Radius.circular(12),
-                                                      topRight: Radius.circular(12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.analytics, color: Colors.white, size: 14),
-                                                      const SizedBox(width: 6),
-                                                      Expanded(
-                                                        child: Text(
-                                                          'SR Stats',
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        'Thống kê\nSR chi tiết',
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: colorScheme.onSurface.withOpacity(0.7),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                
-                                // Column 3: Leitner System (1/6 width) - Split vertically
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 4),
-                                    child: Column(
-                                      children: [
-                                        // Leitner Upper half
-                                        Expanded(
-                                          child: Container(
-                                            margin: const EdgeInsets.only(bottom: 4),
-                                            child: const LeitnerInfoWidget(),
-                                          ),
-                                        ),
-                                        // Leitner Lower half (could be stats or other info)
-                                        Expanded(
-                                          child: Container(
-                                            margin: const EdgeInsets.only(top: 4),
-                                            decoration: BoxDecoration(
-                                              color: colorScheme.surface,
-                                              borderRadius: BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: colorScheme.shadow.withOpacity(0.08),
-                                                  blurRadius: 6,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.teal.shade400,
-                                                    borderRadius: const BorderRadius.only(
-                                                      topLeft: Radius.circular(12),
-                                                      topRight: Radius.circular(12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.trending_up, color: Colors.white, size: 14),
-                                                      const SizedBox(width: 6),
-                                                      Expanded(
-                                                        child: Text(
-                                                          'LS Progress',
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(8),
-                                                    child: Center(
-                                                      child: Text(
-                                                        'Tiến độ\nLeitner System',
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: colorScheme.onSurface.withOpacity(0.7),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
+                  : _buildResponsiveMain(colorScheme),
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildResponsiveMain(ColorScheme colorScheme) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 960; // desktop
+        final isMedium = constraints.maxWidth >= 700 && constraints.maxWidth < 960; // tablet landscape
+
+        if (isWide) {
+          // Original 3-column concept but refined spacing
+            return Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: _buildCalendarCard(colorScheme),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: EnhancedSpacedRepetitionWidget(key: _spacedRepetitionKey),
+                              ),
+                              const SizedBox(height: 12),
+                              Expanded(
+                                child: const EnhancedLeitnerWidget(),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+        }
+
+        if (isMedium) {
+          // Tablet: calendar top, two widgets in a row below
+          return Column(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12,12,12,6),
+                  child: _buildCalendarCard(colorScheme),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12,6,12,12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: EnhancedSpacedRepetitionWidget(key: _spacedRepetitionKey),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: EnhancedLeitnerWidget(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        // Mobile: calendar then two widgets stacked
+        return Column(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12,12,12,6),
+                child: _buildCalendarCard(colorScheme),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(12,6,12,12),
+                children: [
+                  EnhancedSpacedRepetitionWidget(key: _spacedRepetitionKey),
+                  const SizedBox(height: 12),
+                  const EnhancedLeitnerWidget(),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCalendarCard(ColorScheme colorScheme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today, color: colorScheme.onPrimary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Lịch học',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+                const Spacer(),
+                _buildHeaderIconButton(Icons.arrow_back_ios_new, _previousWeek, colorScheme.onPrimary),
+                GestureDetector(
+                  onTap: _goToToday,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      _getMonthYearText(_currentMonth),
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                _buildHeaderIconButton(Icons.arrow_forward_ios, _nextWeek, colorScheme.onPrimary),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      'T2','T3','T4','T5','T6','T7','CN'
+                    ].map((d) => Expanded(
+                      child: Text(
+                        d,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )).toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: _buildMonthCalendar(colorScheme),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderIconButton(IconData icon, VoidCallback onTap, Color color){
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Icon(icon, size: 18, color: color),
       ),
     );
   }

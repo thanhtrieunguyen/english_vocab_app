@@ -7,17 +7,26 @@ class Vocabulary {
   final DateTime createdAt;
   final String? apiDefinitions; // JSON string chứa definitions từ API
   
-  // Spaced Repetition fields
+  // Enhanced Spaced Repetition fields
   final int repetitionCount;
   final double easeFactor;
   final int intervalDays;
   final DateTime? nextReviewDate;
   final int? lastQuality; // 0-5, chất lượng học tập lần cuối
+  final int streak; // Số lần đúng liên tiếp
+  final int totalReviews; // Tổng số lần ôn tập
+  final int totalCorrect; // Tổng số lần trả lời đúng
+  final DateTime? lastReviewDate; // Lần ôn cuối cùng
+  final double difficulty; // Độ khó của từ (0.0-1.0)
+  final List<int> recentQualities; // 5 lần quality gần nhất
   
-  // Leitner System fields
+  // Enhanced Leitner System fields
   final int leitnerBox; // Hộp Leitner (1-5), hộp càng cao = hiểu biết càng tốt
   final int consecutiveCorrect; // Số lần trả lời đúng liên tiếp trong hộp hiện tại
   final DateTime? lastLeitnerReview; // Lần ôn Leitner cuối cùng
+  final int leitnerStreak; // Streak trong Leitner system
+  final int totalLeitnerReviews; // Tổng số lần ôn trong Leitner
+  final int leitnerCorrectAnswers; // Tổng số câu đúng trong Leitner
 
   Vocabulary({
     required this.word,
@@ -32,9 +41,18 @@ class Vocabulary {
     this.intervalDays = 1,
     this.nextReviewDate,
     this.lastQuality,
+    this.streak = 0,
+    this.totalReviews = 0,
+    this.totalCorrect = 0,
+    this.lastReviewDate,
+    this.difficulty = 0.5,
+    this.recentQualities = const [],
     this.leitnerBox = 1,
     this.consecutiveCorrect = 0,
     this.lastLeitnerReview,
+    this.leitnerStreak = 0,
+    this.totalLeitnerReviews = 0,
+    this.leitnerCorrectAnswers = 0,
   });
 
   factory Vocabulary.fromJson(Map<String, dynamic> json) {
@@ -53,11 +71,22 @@ class Vocabulary {
           ? DateTime.parse(json['nextReviewDate'] as String)
           : null,
       lastQuality: json['lastQuality'] as int?,
+      streak: json['streak'] as int? ?? 0,
+      totalReviews: json['totalReviews'] as int? ?? 0,
+      totalCorrect: json['totalCorrect'] as int? ?? 0,
+      lastReviewDate: json['lastReviewDate'] != null 
+          ? DateTime.parse(json['lastReviewDate'] as String)
+          : null,
+      difficulty: (json['difficulty'] as num?)?.toDouble() ?? 0.5,
+      recentQualities: (json['recentQualities'] as List<dynamic>?)?.cast<int>() ?? [],
       leitnerBox: json['leitnerBox'] as int? ?? 1,
       consecutiveCorrect: json['consecutiveCorrect'] as int? ?? 0,
       lastLeitnerReview: json['lastLeitnerReview'] != null 
           ? DateTime.parse(json['lastLeitnerReview'] as String)
           : null,
+      leitnerStreak: json['leitnerStreak'] as int? ?? 0,
+      totalLeitnerReviews: json['totalLeitnerReviews'] as int? ?? 0,
+      leitnerCorrectAnswers: json['leitnerCorrectAnswers'] as int? ?? 0,
     );
   }
 
@@ -75,9 +104,18 @@ class Vocabulary {
       'intervalDays': intervalDays,
       'nextReviewDate': nextReviewDate?.toIso8601String(),
       'lastQuality': lastQuality,
+      'streak': streak,
+      'totalReviews': totalReviews,
+      'totalCorrect': totalCorrect,
+      'lastReviewDate': lastReviewDate?.toIso8601String(),
+      'difficulty': difficulty,
+      'recentQualities': recentQualities,
       'leitnerBox': leitnerBox,
       'consecutiveCorrect': consecutiveCorrect,
       'lastLeitnerReview': lastLeitnerReview?.toIso8601String(),
+      'leitnerStreak': leitnerStreak,
+      'totalLeitnerReviews': totalLeitnerReviews,
+      'leitnerCorrectAnswers': leitnerCorrectAnswers,
     };
   }
 
@@ -118,7 +156,7 @@ class Vocabulary {
       consecutiveCorrect.hashCode ^
       lastLeitnerReview.hashCode;
 
-  // Copy with method for updating spaced repetition data
+  // Enhanced copyWith method with all new fields
   Vocabulary copyWith({
     String? word,
     String? meaning,
@@ -132,9 +170,18 @@ class Vocabulary {
     int? intervalDays,
     DateTime? nextReviewDate,
     int? lastQuality,
+    int? streak,
+    int? totalReviews,
+    int? totalCorrect,
+    DateTime? lastReviewDate,
+    double? difficulty,
+    List<int>? recentQualities,
     int? leitnerBox,
     int? consecutiveCorrect,
     DateTime? lastLeitnerReview,
+    int? leitnerStreak,
+    int? totalLeitnerReviews,
+    int? leitnerCorrectAnswers,
   }) {
     return Vocabulary(
       word: word ?? this.word,
@@ -149,9 +196,18 @@ class Vocabulary {
       intervalDays: intervalDays ?? this.intervalDays,
       nextReviewDate: nextReviewDate ?? this.nextReviewDate,
       lastQuality: lastQuality ?? this.lastQuality,
+      streak: streak ?? this.streak,
+      totalReviews: totalReviews ?? this.totalReviews,
+      totalCorrect: totalCorrect ?? this.totalCorrect,
+      lastReviewDate: lastReviewDate ?? this.lastReviewDate,
+      difficulty: difficulty ?? this.difficulty,
+      recentQualities: recentQualities ?? this.recentQualities,
       leitnerBox: leitnerBox ?? this.leitnerBox,
       consecutiveCorrect: consecutiveCorrect ?? this.consecutiveCorrect,
       lastLeitnerReview: lastLeitnerReview ?? this.lastLeitnerReview,
+      leitnerStreak: leitnerStreak ?? this.leitnerStreak,
+      totalLeitnerReviews: totalLeitnerReviews ?? this.totalLeitnerReviews,
+      leitnerCorrectAnswers: leitnerCorrectAnswers ?? this.leitnerCorrectAnswers,
     );
   }
 
@@ -169,7 +225,7 @@ class Vocabulary {
     return todayDate.isAfter(reviewDateOnly) || todayDate.isAtSameMomentAs(reviewDateOnly);
   }
 
-  // Get status for display
+  // Enhanced status and display methods
   String get reviewStatus {
     if (repetitionCount == 0) return 'Mới';
     if (isDueForReview) return 'Cần ôn lại';
@@ -182,40 +238,77 @@ class Vocabulary {
     return 'Đã học';
   }
 
-  // Get Leitner box name
+  // Enhanced Leitner box name with level descriptions
   String get leitnerBoxName {
     switch (leitnerBox) {
-      case 1:
-        return 'Hộp 1 (Mới)';
-      case 2:
-        return 'Hộp 2 (Đang học)';
-      case 3:
-        return 'Hộp 3 (Quen thuộc)';
-      case 4:
-        return 'Hộp 4 (Thành thạo)';
-      case 5:
-        return 'Hộp 5 (Hoàn thiện)';
-      default:
-        return 'Hộp $leitnerBox';
+      case 1: return 'Mới học';
+      case 2: return 'Đang nhớ';
+      case 3: return 'Khá tốt';
+      case 4: return 'Thành thạo';
+      case 5: return 'Xuất sắc';
+      default: return 'Hộp $leitnerBox';
     }
   }
 
-  // Get Leitner box color
+  // Enhanced Leitner box color with better visual distinction
   int get leitnerBoxColor {
     switch (leitnerBox) {
-      case 1:
-        return 0xFFE57373; // Red - New/Difficult
-      case 2:
-        return 0xFFFFB74D; // Orange - Learning
-      case 3:
-        return 0xFFFFD54F; // Yellow - Familiar
-      case 4:
-        return 0xFF81C784; // Light Green - Proficient
-      case 5:
-        return 0xFF4CAF50; // Green - Mastered
-      default:
-        return 0xFF9E9E9E; // Grey - Unknown
+      case 1: return 0xFFEF5350; // Red - cần học nhiều
+      case 2: return 0xFFFF9800; // Orange - đang tiến bộ
+      case 3: return 0xFFFFC107; // Amber - tạm ổn
+      case 4: return 0xFF66BB6A; // Light Green - khá tốt
+      case 5: return 0xFF4CAF50; // Green - thành thạo
+      default: return 0xFF9E9E9E; // Grey
     }
+  }
+
+  // Icon cho Leitner box
+  int get leitnerBoxIcon {
+    switch (leitnerBox) {
+      case 1: return 0xe80c; // school
+      case 2: return 0xe8e6; // trending_up
+      case 3: return 0xe8da; // psychology
+      case 4: return 0xe839; // star_half
+      case 5: return 0xe838; // star
+      default: return 0xe887; // help
+    }
+  }
+
+  // Tính tỷ lệ chính xác SR
+  double get srAccuracyRate {
+    if (totalReviews == 0) return 0.0;
+    return totalCorrect / totalReviews;
+  }
+
+  // Tính tỷ lệ chính xác Leitner
+  double get leitnerAccuracyRate {
+    if (totalLeitnerReviews == 0) return 0.0;
+    return leitnerCorrectAnswers / totalLeitnerReviews;
+  }
+
+  // Kiểm tra xem từ có đang "hot streak" không
+  bool get isOnStreak => streak >= 3;
+
+  // Kiểm tra từ khó
+  bool get isDifficult => difficulty > 0.7 || (recentQualities.isNotEmpty && 
+      recentQualities.where((q) => q <= 2).length >= 3);
+
+  // Mức độ thành thạo tổng thể (0.0 - 1.0)
+  double get masteryLevel {
+    final srMastery = srAccuracyRate * 0.4;
+    final leitnerMastery = (leitnerBox / 5.0) * 0.4;
+    final streakBonus = (streak / 10.0).clamp(0.0, 0.2);
+    return (srMastery + leitnerMastery + streakBonus).clamp(0.0, 1.0);
+  }
+
+  // Màu sắc cho mức độ thành thạo
+  int get masteryColor {
+    final level = masteryLevel;
+    if (level < 0.3) return 0xFFEF5350; // Red
+    if (level < 0.5) return 0xFFFF9800; // Orange
+    if (level < 0.7) return 0xFFFBC02D; // Yellow
+    if (level < 0.9) return 0xFF8BC34A; // Light Green
+    return 0xFF4CAF50; // Green
   }
 
   // Check if this vocabulary needs Leitner review

@@ -22,8 +22,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
 
-  Map<String, int> _todayStats = {'correct': 0, 'total': 0};
-
   @override
   void initState() {
     super.initState();
@@ -42,7 +40,9 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
     ));
 
     _loadReviewItems();
-    _loadTodayStats();
+    
+    // Đảm bảo khởi tạo dữ liệu Spaced Repetition
+    _spacedRepetitionService.performDailyCheck();
   }
 
   @override
@@ -83,13 +83,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
     }
   }
 
-  Future<void> _loadTodayStats() async {
-    final stats = await _spacedRepetitionService.getTodayReviewStats();
-    setState(() {
-      _todayStats = stats;
-    });
-  }
-
   void _toggleShowAnswer() {
     setState(() {
       _showAnswer = !_showAnswer;
@@ -108,14 +101,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
         vocabularyIndex: currentItem.vocabularyIndex,
         quality: quality,
       );
-
-      // Cập nhật stats
-      setState(() {
-        _todayStats['total'] = _todayStats['total']! + 1;
-        if (quality >= 3) {
-          _todayStats['correct'] = _todayStats['correct']! + 1;
-        }
-      });
 
       // Chuyển sang câu tiếp theo hoặc hoàn thành
       _nextQuestion();
@@ -169,11 +154,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
         foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.analytics),
-            onPressed: _showStatsDialog,
-            tooltip: 'Xem thống kê',
-          ),
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
@@ -244,13 +224,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
-                    ),
-                  ),
-                  Text(
-                    'Hôm nay: ${_todayStats['correct']}/${_todayStats['total']}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -555,9 +528,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
   Widget _buildCompletedView() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final accuracy = _todayStats['total']! > 0 
-        ? ((_todayStats['correct']! / _todayStats['total']!) * 100).round()
-        : 0;
 
     return Center(
       child: Column(
@@ -596,53 +566,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          if (_todayStats['total']! > 0) ...[
-            Container(
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.symmetric(horizontal: 32),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Kết quả hôm nay',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem(
-                        'Tổng số',
-                        '${_todayStats['total']}',
-                        Icons.quiz,
-                        colorScheme.primary,
-                      ),
-                      _buildStatItem(
-                        'Đúng',
-                        '${_todayStats['correct']}',
-                        Icons.check_circle,
-                        Colors.green,
-                      ),
-                      _buildStatItem(
-                        'Độ chính xác',
-                        '$accuracy%',
-                        Icons.analytics,
-                        Colors.blue,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
             style: ElevatedButton.styleFrom(
@@ -656,134 +579,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
             child: const Text(
               'Quay lại',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
-      ],
-    );
-  }
-
-  void _showStatsDialog() async {
-    final weeklyStats = await _spacedRepetitionService.getWeeklyReviewStats();
-    final vocabularyLevels = await _spacedRepetitionService.getVocabularyLevels();
-    
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Thống kê Spaced Repetition',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cấp độ từ vựng:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildLevelRow('Mới', vocabularyLevels['new']!, Colors.blue),
-              _buildLevelRow('Đang học', vocabularyLevels['learning']!, Colors.orange),
-              _buildLevelRow('Đang ôn', vocabularyLevels['reviewing']!, Colors.purple),
-              _buildLevelRow('Thành thạo', vocabularyLevels['mature']!, Colors.green),
-              const SizedBox(height: 16),
-              Text(
-                'Kết quả 7 ngày gần nhất:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...weeklyStats.map((stat) => _buildWeeklyStatRow(stat)),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Đóng'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLevelRow(String label, int count, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(label),
-            ],
-          ),
-          Text(
-            '$count từ',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeeklyStatRow(Map<String, dynamic> stat) {
-    final date = stat['date'] as DateTime;
-    final dayName = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][date.weekday % 7];
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('$dayName ${date.day}/${date.month}'),
-          Text(
-            '${stat['correct']}/${stat['total']} (${stat['accuracy']}%)',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: stat['accuracy'] >= 80 ? Colors.green : 
-                     stat['accuracy'] >= 60 ? Colors.orange : Colors.red,
             ),
           ),
         ],
@@ -827,7 +622,6 @@ class _SpacedRepetitionScreenState extends State<SpacedRepetitionScreen>
                   ),
                 );
                 _loadReviewItems();
-                _loadTodayStats();
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

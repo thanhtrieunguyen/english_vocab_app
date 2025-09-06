@@ -74,6 +74,7 @@ dev_dependencies:
   # For JSON code generation
   build_runner: ^2.4.9
   json_serializable: ^6.7.1
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -85,6 +86,31 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/images/logo.svg
+    - assets/images/logo.png
+
+# App icon generation config
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: assets/images/logo.svg
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/images/logo.svg
+  web:
+    generate: true
+    image_path: assets/images/logo.svg
+    background_color: "#FFFFFF"
+    theme_color: "#4F7DFF"
+  windows:
+    generate: true
+    image_path: assets/images/logo.svg
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: assets/images/logo.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

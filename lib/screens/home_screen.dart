@@ -214,12 +214,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text(
-          'English Vocabulary App',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/logo.svg',
+              height: 36,
+              errorBuilder: (c, e, s) => const Icon(Icons.menu_book),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'English Vocabulary App',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+            ),
+          ],
         ),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,

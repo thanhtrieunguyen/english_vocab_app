@@ -1,7 +1,7 @@
 # 📚 Ứng Dụng Học Từ Vựng Tiếng Anh
 
 <div align="center">
-  <img src="docs/images/app_logo.png" alt="App Logo" width="120"/>
+  <img src="docs/images/logo.png" alt="App Logo" width="120"/>
   
   <p><em>Một ứng dụng Flutter Desktop cho Windows giúp bạn học và ghi nhớ từ vựng tiếng Anh một cách hiệu quả thông qua các phương pháp khoa học.</em></p>
   
@@ -31,18 +31,6 @@
       <img src="docs/gifs/windows_quiz_demo.gif" alt="Quiz" width="300"/>
       <br/>
       <strong>Chế độ Quiz</strong>
-    </td>
-    <td align="center">
-      <img src="docs/gifs/windows_leitner_demo.gif" alt="Hệ thống Leitner" width="300"/>
-      <br/>
-      <strong>Hệ thống Leitner</strong>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="docs/gifs/windows_spaced_repetition_demo.gif" alt="Spaced Repetition" width="300"/>
-      <br/>
-      <strong>Spaced Repetition</strong>
     </td>
     <td align="center">
       <img src="docs/gifs/windows_theme_toggle_demo.gif" alt="Chuyển theme" width="300"/>
@@ -78,10 +66,6 @@
 - **Flashcard**: Học theo thẻ ghi nhớ truyền thống
 - **Ôn tập theo lịch**: Học theo lịch trình được tối ưu hóa
 - **Kiểm tra nhanh**: Đánh giá nhanh mức độ hiểu biết
-
-<div align="center">
-  <img src="docs/images/study_modes.png" alt="Chế độ học tập" width="700"/>
-</div>
 
 ### 🎨 Giao Diện & Trải Nghiệm
 - 🌙 Chế độ sáng/tối
@@ -126,10 +110,6 @@
 - `json_annotation` & `json_serializable`: Xử lý JSON
 
 ## 📁 Cấu Trúc Dự Án
-
-<div align="center">
-  <img src="docs/images/project_structure.png" alt="Cấu trúc dự án" width="600"/>
-</div>
 
 ```
 lib/
@@ -198,10 +178,6 @@ flutter build windows --release
 
 ## 📚 Hướng Dẫn Sử Dụng
 
-<div align="center">
-  <img src="docs/images/user_guide_banner.png" alt="Hướng dẫn sử dụng" width="700"/>
-</div>
-
 ### 1. Thêm Từ Vựng Mới
 <div align="center">
   <img src="docs/gifs/add_vocabulary_step_by_step.gif" alt="Thêm từ vựng từng bước" width="400"/>
@@ -211,17 +187,7 @@ flutter build windows --release
 - Nhập từ, nghĩa, phiên âm, ghi nhớ và ví dụ
 - Lưu để thêm vào danh sách học tập
 
-### 2. Học Theo Hệ Thống Leitner
-<div align="center">
-  <img src="docs/gifs/leitner_system_flow.gif" alt="Luồng hệ thống Leitner" width="400"/>
-</div>
-
-- Chọn "Hệ thống Leitner" từ menu
-- Từ vựng được chia vào 5 hộp theo mức độ thành thạo
-- Trả lời đúng để chuyển từ lên hộp cao hơn
-- Trả lời sai để đưa từ về hộp thấp hơn
-
-### 3. Ôn Tập Theo Spaced Repetition
+### 2. Ôn Tập Theo Spaced Repetition
 <div align="center">
   <img src="docs/gifs/spaced_repetition_flow.gif" alt="Luồng Spaced Repetition" width="400"/>
 </div>
@@ -238,12 +204,6 @@ flutter build windows --release
 - Chọn "Quiz" để làm bài kiểm tra
 - Có thể lọc theo hộp Leitner hoặc trạng thái ôn tập
 - Xem kết quả và phân tích chi tiết
-
-## 🎯 Thuật Toán Học Tập
-
-<div align="center">
-  <img src="docs/images/learning_algorithms.png" alt="Thuật toán học tập" width="800"/>
-</div>
 
 ### Hệ Thống Leitner
 <div align="center">
@@ -266,62 +226,19 @@ flutter build windows --release
 - Quality: Đánh giá từ 0-5 điểm
 - Tự động điều chỉnh lịch học dựa trên hiệu suất
 
-<div align="center">
-  <img src="docs/gifs/algorithm_visualization.gif" alt="Minh họa thuật toán" width="500"/>
-</div>
-
 ## 📄 Giấy Phép
 
 Dự án này dành cho mục đích học tập và sử dụng cá nhân.
 
 ## � Thông Tin Liên Hệ
 
-- 📧 Email: [your-email@example.com]
-- 🌐 Website: [your-website.com]
-- 📱 GitHub: [your-github-username]
+- 📧 Email: [thanhtrieunguyen2004@gmail.com]
+- 📱 GitHub: [thanhtrieunguyen]
 
 ## � Screenshots & Media
 
 <details>
 <summary>�️ Xem thêm screenshots Windows</summary>
-
-### Giao Diện Chính Windows
-<table>
-  <tr>
-    <td><img src="docs/images/windows_home_light.png" alt="Windows Home Light" width="300"/></td>
-    <td><img src="docs/images/windows_home_dark.png" alt="Windows Home Dark" width="300"/></td>
-  </tr>
-</table>
-
-### Quản Lý Từ Vựng
-<table>
-  <tr>
-    <td><img src="docs/images/windows_vocab_list.png" alt="Danh sách từ vựng" width="250"/></td>
-    <td><img src="docs/images/windows_add_vocab.png" alt="Thêm từ vựng" width="250"/></td>
-    <td><img src="docs/images/windows_edit_vocab.png" alt="Chỉnh sửa từ vựng" width="250"/></td>
-  </tr>
-</table>
-
-### Hệ Thống Học Tập
-<table>
-  <tr>
-    <td><img src="docs/images/windows_leitner_boxes.png" alt="Hộp Leitner" width="250"/></td>
-    <td><img src="docs/images/windows_spaced_repetition.png" alt="Spaced Repetition" width="250"/></td>
-    <td><img src="docs/images/windows_quiz_mode.png" alt="Quiz Mode" width="250"/></td>
-  </tr>
-</table>
-
-### Thống Kê & Báo Cáo
-<table>
-  <tr>
-    <td><img src="docs/images/windows_statistics.png" alt="Thống kê" width="250"/></td>
-    <td><img src="docs/images/windows_progress.png" alt="Tiến độ" width="250"/></td>
-    <td><img src="docs/images/windows_achievements.png" alt="Thành tích" width="250"/></td>
-  </tr>
-</table>
-</details>
-
-> 📝 **Lưu ý**: Để thêm screenshots thực tế, hãy xem hướng dẫn trong file [`docs/MEDIA_GUIDE.md`](docs/MEDIA_GUIDE.md)
 
 ## 🙏 Lời Cảm Ơn
 
